@@ -87,8 +87,8 @@ jobs:
     - name: Build
       run: |
         cd "${Env:BASE_PATH}"
-        msbuild "${Env:BASE_NAME}.csproj" -property:Platform=Any -property:Configuration=Debug
-        msbuild "${Env:BASE_NAME}.csproj" -property:Platform=Any -property:Configuration=Release
+        msbuild "${Env:BASE_NAME}.csproj" -property:Platform=AnyCPU -property:Configuration=Debug
+        msbuild "${Env:BASE_NAME}.csproj" -property:Platform=AnyCPU -property:Configuration=Release
 
     - name: List artifacts
       run: |
