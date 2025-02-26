@@ -1,0 +1,155 @@
+# This workflow will install MSVC dependencies and
+# build debug and release OCXs on demand or version tag push.
+
+name: .NET Build Library Assembly
+
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+  workflow_dispatch:
+
+
+env:
+  PRODUCT_NAME: PoshWinRT
+  BASE_PATH: PoshWinRT
+  BASE_NAME: PoshWinRT
+  ARCHIVE_BASE_NAME: PoshWinRT-Windows-x64-latest
+
+
+jobs:
+
+  build:
+
+    strategy:
+      matrix:
+        os:
+          - windows-latest
+
+    runs-on: ${{ matrix.os }}
+
+    outputs:
+      short-sha: ${{ steps.short-hash.outputs.short-sha }}
+
+    steps:
+
+    - uses: actions/checkout@v4
+
+    - name: Set short commit hash variable
+      id: short-hash
+      shell: pwsh
+      run: |
+        $shortHash = ${Env:GITHUB_SHA}.Substring(0, 7)
+
+        Write-Output "SHORT_SHA=$shortHash" >> "${Env:GITHUB_ENV}"
+        Write-Output "short-sha=$shortHash" >> "${Env:GITHUB_OUTPUT}"
+
+    - name: Set version name variable
+      shell: pwsh
+      run: |
+        $versionName = ${Env:SHORT_SHA}
+        
+        if (${Env:GITHUB_REF} -match '^refs/tags/v')
+        {
+          $versionName = ${Env:GITHUB_REF_NAME}
+        }
+
+        Write-Output "VERSION_NAME=$versionName" >> "${Env:GITHUB_ENV}"
+
+    - name: Show build variables
+      shell: pwsh
+      run: |
+        Write-Host "GitHub ref: ${{ github.ref }}"
+        Write-Host "GitHub ref name: ${{ github.ref_name }}"
+        Write-Host "Commit short SHA: ${Env:SHORT_SHA}"
+        Write-Host "Version name: ${Env:VERSION_NAME}"
+        Write-Host "Base path: ${Env:BASE_PATH}"
+        Write-Host "Base name: ${Env:BASE_NAME}"
+        Write-Host "Archive base name: ${Env:ARCHIVE_BASE_NAME}"
+
+    #- name: Install MSVC
+    #  uses: aminya/setup-cpp@v1
+    #  with:
+    #    compiler: msvc
+    #    vcvarsall: true
+
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v2
+
+    #- name: Setup NuGet
+    #  uses: NuGet/setup-nuget@v1.0.2
+     
+    #- name: Restore NuGet Packages
+    #  run: nuget restore SimpleFrameworkApp.sln
+
+    - name: Build
+      run: |
+        cd "${Env:BASE_PATH}"
+        msbuild "${Env:BASE_NAME}.csproj" -property:Platform=Any -property:Configuration=Debug
+        msbuild "${Env:BASE_NAME}.csproj" -property:Platform=Any -property:Configuration=Release
+
+    - name: List artifacts
+      run: |
+        Get-ChildItem "${Env:BASE_PATH}" -Recurse
+
+    - name: Zip executable
+      shell: pwsh
+      run: |
+        cd "${Env:BASE_PATH}"
+        7z a "${Env:ARCHIVE_BASE_NAME}.zip" "Debug\${Env:BASE_NAME}.dll" "Debug\${Env:BASE_NAME}.pdb" "Release\${Env:BASE_NAME}.dll" "Release\${Env:BASE_NAME}.pdb"
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.PRODUCT_NAME }}
+        path: |
+          ${{ env.BASE_PATH }}/${{ env.ARCHIVE_BASE_NAME }}.zip
+
+
+  publish:
+
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+
+    - name: Create dist directory
+      run: mkdir dist
+
+    - name: Download artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: ${{ env.PRODUCT_NAME }}
+        path: dist
+ 
+    - name: Display structure of downloaded files
+      run: ls -R
+      working-directory: dist
+  
+    - name: Publish on-demand release
+      if: ${{ ! startsWith(github.ref, 'refs/tags/v') }}
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "ondemand"
+        prerelease: true
+        title: "Development Release ${{ needs.build.outputs.short-sha }}"
+        files: |
+          dist/*.zip
+
+    - name: Publish version release
+      if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: ${{ github.ref_name }}
+        prerelease: false
+        title: "${{ env.PRODUCT_NAME }} ${{ github.ref_name }}"
+        files: |
+          dist/*.zip
