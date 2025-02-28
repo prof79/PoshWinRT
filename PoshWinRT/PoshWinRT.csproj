@@ -54,6 +54,7 @@
     <Compile Include="AsyncActionWrapper.cs" />
     <Compile Include="AsyncInfoWrapper.cs" />
     <Compile Include="AsyncOperationWrapper.cs" />
+    <Compile Include="AsyncOperationWithProgressWrapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
