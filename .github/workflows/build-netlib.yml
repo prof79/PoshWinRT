@@ -75,14 +75,19 @@ jobs:
     #    compiler: msvc
     #    vcvarsall: true
 
-    - name: Install MSBuild Tools
-      uses: microsoft/setup-msbuild@v2
+    - name: Install .NET 4.x
+      shell: pwsh
+      run: |
+        Install-WindowsFeature -Name 'NET-Framework-45-Core'
 
     - name: Install Windows SDK
       uses: prof79/windows-sdk-install@latest
       with:
         version-sdk: 26100
         features: 'OptionId.NetFxSoftwareDevelopmentKit,OptionId.UWPManaged'
+
+    - name: Install MSBuild Tools
+      uses: microsoft/setup-msbuild@v2
 
     #- name: Setup NuGet
     #  uses: NuGet/setup-nuget@v1.0.2
