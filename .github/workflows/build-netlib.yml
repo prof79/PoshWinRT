@@ -76,7 +76,7 @@ jobs:
     #    vcvarsall: true
 
     - name: Install Windows SDK
-      uses: Lamparter/Install-WindowsSdk@latest
+      uses: Lamparter/Install-WindowsSdk
       with:
           buildNumber: '26100'
 
