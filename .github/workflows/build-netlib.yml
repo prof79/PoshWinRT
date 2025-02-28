@@ -76,9 +76,9 @@ jobs:
     #    vcvarsall: true
 
     - name: Install Windows SDK
-      uses: GuillaumeFalourd/setup-windows10-sdk-action@v2.4
+      uses: Lamparter/Install-WindowsSdk@latest
       with:
-        sdk-version: 26100
+          buildNumber: '26100'
 
     - name: Install MSBuild Tools
       uses: microsoft/setup-msbuild@v2
