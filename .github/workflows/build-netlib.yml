@@ -76,9 +76,9 @@ jobs:
     #    vcvarsall: true
 
     - name: Install Windows SDK
-      uses: ChristopheLav/windows-sdk-install@main
+      uses: prof79/windows-sdk-install@latest
       with:
-        version-sdk: 19041
+        version-sdk: 26100
         features: 'OptionId.NetFxSoftwareDevelopmentKit,OptionId.UWPManaged'
 
     - name: Install MSBuild Tools
