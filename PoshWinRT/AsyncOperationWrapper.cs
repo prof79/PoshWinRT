@@ -1,9 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
-using Windows.Foundation;
+﻿// AsyncOperationWrapper.cs
 
 namespace PoshWinRT
 {
+    using System;
+    using System.Threading.Tasks;
+    using Windows.Foundation;
+
     public class AsyncOperationWrapper<T> : AsyncInfoWrapper<IAsyncOperation<T>>
     {
         public AsyncOperationWrapper(object asyncOperation) : base(asyncOperation) { }

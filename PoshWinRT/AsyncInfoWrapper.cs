@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.Foundation;
+﻿// AsyncInfoWrapper.cs
 
 namespace PoshWinRT
 {
+    using System;
+    using Windows.Foundation;
+
     public abstract class AsyncInfoWrapper<T> : IDisposable where T : IAsyncInfo
     {
         protected T _asyncInfo;
@@ -44,8 +42,5 @@ namespace PoshWinRT
         {
             get { return _asyncInfo.Status; }
         }
-
     }
-
 }
-

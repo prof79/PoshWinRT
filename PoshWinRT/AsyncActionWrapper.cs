@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.Foundation;
+﻿// AsyncActionWrapper.cs
 
 namespace PoshWinRT
 {
+    using System;
+    using System.Threading.Tasks;
+    using Windows.Foundation;
+
     public class AsyncActionWrapper : AsyncInfoWrapper<IAsyncAction>
     {
         public AsyncActionWrapper(object asyncAction) : base(asyncAction) { }
@@ -34,6 +33,5 @@ namespace PoshWinRT
                 throw new TaskCanceledException(task);
             }
         }
-
     }
 }
