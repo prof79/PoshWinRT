@@ -78,7 +78,7 @@ jobs:
     - name: Install Windows SDK
       uses: ChristopheLav/windows-sdk-install@main
       with:
-        version-sdk: 26100
+        version-sdk: 19041
         features: 'OptionId.NetFxSoftwareDevelopmentKit,OptionId.UWPManaged'
 
     - name: Install MSBuild Tools
