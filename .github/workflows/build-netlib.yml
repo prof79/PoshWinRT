@@ -80,90 +80,66 @@ jobs:
       run: |
         Install-WindowsFeature -Name 'NET-Framework-45-Core'
 
-    - name: Install .NET 4.x Runtime
+    - name: Install .NET 4.x Dependencies
       shell: pwsh
       run: |
-        Write-Host "Installing .NET 4.x Runtime ..."
+        Write-Host "Installing dependencies ..."
 
-        Write-Host "Downloading Runtime ..."
-
-        $url = 'https://download.microsoft.com/download/4/b/2/cd00d4ed-ebdd-49ee-8a33-eabc3d1030e3/NDP481-x86-x64-AllOS-ENU.exe'
-
-        $session = New-Object Microsoft.PowerShell.Commands.WebRequestSession
-
-        Invoke-WebRequest -UseBasicParsing -Uri $url `
-          -OutFile 'NET-AllOS-ENU.exe' `
-          -WebSession $session `
-          -UserAgent "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0" `
-          -Headers @{
-            "Accept" = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
-            "Accept-Language" = "en-US,en;q=0.5"
-            "Accept-Encoding" = "gzip, deflate, br, zstd"
-            "Referer" = "https://dotnet.microsoft.com/"
-            "DNT" = "1"
-            "Upgrade-Insecure-Requests" = "1"
-            "Sec-Fetch-Dest" = "document"
-            "Sec-Fetch-Mode" = "navigate"
-            "Sec-Fetch-Site" = "same-site"
-            "Sec-GPC" = "1"
-            "Priority" = "u=0, i"
+        $downloads = @(
+          @{
+            'URL' = 'https://download.microsoft.com/download/4/b/2/cd00d4ed-ebdd-49ee-8a33-eabc3d1030e3/NDP481-x86-x64-AllOS-ENU.exe'
+            'EXE' = 'NDP481-x86-x64-AllOS-ENU.exe'
+            'Description' = '.NET Framework 4.8.1 Runtime'
+          },
+          @{
+            'URL' = 'https://download.microsoft.com/download/7/1/7/71795fde-1cca-41b0-b495-00b1ab656994/NDP472-DevPack-ENU.exe'
+            'EXE' = 'NDP472-DevPack-ENU.exe'
+            'Description' = '.NET Framework 4.7.2 DevPack'
+          },
+          @{
+            'URL' = 'https://download.microsoft.com/download/8/1/8/81877d8b-a9b2-4153-9ad2-63a6441d11dd/NDP481-DevPack-ENU.exe'
+            'EXE' = 'NDP481-DevPack-ENU.exe'
+            'Description' = '.NET Framework 4.8.1 DevPack'
           }
+        )
 
-        Write-Host
-        Write-Host "Installing Runtime ..."
-
-        $process = Start-Process -Wait .\NET-AllOS-ENU.exe "/install /quiet" -PassThru
-
-        $processExitCode = $process.ExitCode
-
-        Write-Host ".NET Runtime installation exit code: $processExitCode"
-
-        if ($processExitCode)
+        foreach ($download in $downloads)
         {
-          Write-Error ".NET Framework 4.x Runtime installation failed."
-        }
+          Write-Host "Downloading $($download.Description) ..."
 
-    - name: Install .NET 4.x DevPack
-      shell: pwsh
-      run: |
-        Write-Host "Installing .NET 4.x DevPack ..."
+          $session = New-Object Microsoft.PowerShell.Commands.WebRequestSession
 
-        Write-Host "Downloading DevPack ..."
+          Invoke-WebRequest -UseBasicParsing -Uri $download.url `
+            -OutFile $download.exe `
+            -WebSession $session `
+            -UserAgent "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0" `
+            -Headers @{
+              "Accept" = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+              "Accept-Language" = "en-US,en;q=0.5"
+              "Accept-Encoding" = "gzip, deflate, br, zstd"
+              "Referer" = "https://dotnet.microsoft.com/"
+              "DNT" = "1"
+              "Upgrade-Insecure-Requests" = "1"
+              "Sec-Fetch-Dest" = "document"
+              "Sec-Fetch-Mode" = "navigate"
+              "Sec-Fetch-Site" = "same-site"
+              "Sec-GPC" = "1"
+              "Priority" = "u=0, i"
+            }
 
-        $url = 'https://download.microsoft.com/download/8/1/8/81877d8b-a9b2-4153-9ad2-63a6441d11dd/NDP481-DevPack-ENU.exe'
+          Write-Host
+          Write-Host "Installing $($download.Description) ..."
 
-        $session = New-Object Microsoft.PowerShell.Commands.WebRequestSession
+          $process = Start-Process -Wait $download.exe "/install /quiet" -PassThru
 
-        Invoke-WebRequest -UseBasicParsing -Uri $url `
-          -OutFile 'NET-DevPack-ENU.exe' `
-          -WebSession $session `
-          -UserAgent "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0" `
-          -Headers @{
-            "Accept" = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
-            "Accept-Language" = "en-US,en;q=0.5"
-            "Accept-Encoding" = "gzip, deflate, br, zstd"
-            "Referer" = "https://dotnet.microsoft.com/"
-            "DNT" = "1"
-            "Upgrade-Insecure-Requests" = "1"
-            "Sec-Fetch-Dest" = "document"
-            "Sec-Fetch-Mode" = "navigate"
-            "Sec-Fetch-Site" = "same-site"
-            "Sec-GPC" = "1"
-            "Priority" = "u=0, i"
+          $processExitCode = $process.ExitCode
+
+          Write-Host "$($download.Description) installation exit code: $processExitCode"
+
+          if ($processExitCode)
+          {
+            Write-Error "$($download.Description) installation failed."
           }
-
-        Write-Host
-        Write-Host "Installing DevPack ..."
-
-        $process = Start-Process -Wait .\NET-DevPack-ENU.exe "/install /quiet" -PassThru
-
-        $processExitCode = $process.ExitCode
-
-        Write-Host ".NET DevPack installation exit code: $processExitCode"
-
-        if ($processExitCode)
-        {
-          Write-Error ".NET Framework 4.x DevPack installation failed."
         }
 
     - name: Install Windows SDK
