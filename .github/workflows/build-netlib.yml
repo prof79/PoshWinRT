@@ -80,14 +80,49 @@ jobs:
       run: |
         Install-WindowsFeature -Name 'NET-Framework-45-Core'
 
+    - name: Install .NET 4.x Runtime
+      shell: pwsh
+      run: |
+        Write-Host "Downloading Runtime ..."
+
+        $url = 'https://download.microsoft.com/download/4/b/2/cd00d4ed-ebdd-49ee-8a33-eabc3d1030e3/NDP481-x86-x64-AllOS-ENU.exe'
+
+        $session = New-Object Microsoft.PowerShell.Commands.WebRequestSession
+
+        Invoke-WebRequest -UseBasicParsing -Uri $url `
+          -OutFile 'NET-AllOS-ENU.exe' `
+          -WebSession $session `
+          -UserAgent "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0" `
+          -Headers @{
+            "Accept" = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+            "Accept-Language" = "en-US,en;q=0.5"
+            "Accept-Encoding" = "gzip, deflate, br, zstd"
+            "Referer" = "https://dotnet.microsoft.com/"
+            "DNT" = "1"
+            "Upgrade-Insecure-Requests" = "1"
+            "Sec-Fetch-Dest" = "document"
+            "Sec-Fetch-Mode" = "navigate"
+            "Sec-Fetch-Site" = "same-site"
+            "Sec-GPC" = "1"
+            "Priority" = "u=0, i"
+          }
+
+        Write-Host
+        Write-Host "Installing Runtime ..."
+        $process = Start-Process -Wait .\NET-AllOS-ENU.exe "/install /quiet" -PassThru
+
+        Write-Host ".NET Runtime installation exit code: $($process.ExitCode)"
+
     - name: Install .NET 4.x DevPack
       shell: pwsh
       run: |
         Write-Host "Downloading DevPack ..."
 
+        $url = 'https://download.microsoft.com/download/8/1/8/81877d8b-a9b2-4153-9ad2-63a6441d11dd/NDP481-DevPack-ENU.exe'
+
         $session = New-Object Microsoft.PowerShell.Commands.WebRequestSession
 
-        Invoke-WebRequest -UseBasicParsing -Uri "https://download.microsoft.com/download/8/1/8/81877d8b-a9b2-4153-9ad2-63a6441d11dd/NDP481-DevPack-ENU.exe" `
+        Invoke-WebRequest -UseBasicParsing -Uri $url `
           -OutFile 'NET-DevPack-ENU.exe' `
           -WebSession $session `
           -UserAgent "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0" `
