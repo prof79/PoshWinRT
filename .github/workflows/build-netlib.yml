@@ -75,10 +75,15 @@ jobs:
     #    compiler: msvc
     #    vcvarsall: true
 
-    - name: Install .NET 4.x
+    - name: Install .NET 4.x Server Feature
       shell: pwsh
       run: |
         Install-WindowsFeature -Name 'NET-Framework-45-Core'
+
+    - name: Install .NET 4.x DevPack
+      shell: pwsh
+      run: |
+        Write-Host "Downloading DevPack ..."
 
         $session = New-Object Microsoft.PowerShell.Commands.WebRequestSession
 
@@ -100,7 +105,9 @@ jobs:
             "Priority" = "u=0, i"
           }
 
-        $process = Start-Process -Wait .\NET-DevPack-ENU.exe "/install /quiet /norestart" -PassThru
+        Write-Host
+        Write-Host "Installing DevPack ..."
+        $process = Start-Process -Wait .\NET-DevPack-ENU.exe "/install /quiet" -PassThru
 
         Write-Host ".NET DevPack installation exit code: $($process.ExitCode)"
 
