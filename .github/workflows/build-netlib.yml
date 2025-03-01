@@ -80,6 +80,30 @@ jobs:
       run: |
         Install-WindowsFeature -Name 'NET-Framework-45-Core'
 
+        $session = New-Object Microsoft.PowerShell.Commands.WebRequestSession
+
+        Invoke-WebRequest -UseBasicParsing -Uri "https://download.microsoft.com/download/8/1/8/81877d8b-a9b2-4153-9ad2-63a6441d11dd/NDP481-DevPack-ENU.exe" `
+          -OutFile 'NET-DevPack-ENU.exe' `
+          -WebSession $session `
+          -UserAgent "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0" `
+          -Headers @{
+            "Accept" = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+            "Accept-Language" = "en-US,en;q=0.5"
+            "Accept-Encoding" = "gzip, deflate, br, zstd"
+            "Referer" = "https://dotnet.microsoft.com/"
+            "DNT" = "1"
+            "Upgrade-Insecure-Requests" = "1"
+            "Sec-Fetch-Dest" = "document"
+            "Sec-Fetch-Mode" = "navigate"
+            "Sec-Fetch-Site" = "same-site"
+            "Sec-GPC" = "1"
+            "Priority" = "u=0, i"
+          }
+
+        $process = Start-Process -Wait ".\NET-DevPack-ENU.exe /install /quiet /norestart" -PassThru
+
+        Write-Host ".NET DevPack installation exit code: $($process.ExitCode)"
+
     - name: Install Windows SDK
       uses: prof79/windows-sdk-install@latest
       with:
