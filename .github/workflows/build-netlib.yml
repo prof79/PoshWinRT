@@ -147,7 +147,7 @@ jobs:
       with:
         version-sdk: 26100
         #features: 'OptionId.NetFxSoftwareDevelopmentKit,OptionId.UWPManaged'
-        features: 'OptionId.UWPManaged'
+        features: 'OptionId.UWPManaged,OptionId.UWPCPP'
 
     - name: Install MSBuild Tools
       uses: microsoft/setup-msbuild@v2
