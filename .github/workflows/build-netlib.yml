@@ -100,7 +100,7 @@ jobs:
             "Priority" = "u=0, i"
           }
 
-        $process = Start-Process -Wait ".\NET-DevPack-ENU.exe /install /quiet /norestart" -PassThru
+        $process = Start-Process -Wait .\NET-DevPack-ENU.exe "/install /quiet /norestart" -PassThru
 
         Write-Host ".NET DevPack installation exit code: $($process.ExitCode)"
 
