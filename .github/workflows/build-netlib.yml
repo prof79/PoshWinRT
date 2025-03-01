@@ -170,7 +170,8 @@ jobs:
       uses: prof79/windows-sdk-install@latest
       with:
         version-sdk: 26100
-        features: 'OptionId.NetFxSoftwareDevelopmentKit,OptionId.UWPManaged'
+        #features: 'OptionId.NetFxSoftwareDevelopmentKit,OptionId.UWPManaged'
+        features: 'OptionId.UWPManaged'
 
     - name: Install MSBuild Tools
       uses: microsoft/setup-msbuild@v2
